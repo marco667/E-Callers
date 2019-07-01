@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>E-Call</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <session-config> 
+		<session-timeout>60</session-timeout>
+  </session-config>
+  
+   <listener>
+    <listener-class>org.digit.ECallers.config.InitialisationDAOFactory</listener-class>
+  </listener>
+  
+  <filter>
+  	<filter-name>RestrictionFilter</filter-name>
+  	<filter-class>org.digit.ECallers.filters.RestrictionFilter</filter-class>
+  </filter>
+  <filter-mapping>
+  	<filter-name>RestrictionFilter</filter-name>
+  	<url-pattern>/WEB-INF/*</url-pattern>
+  </filter-mapping>
+  
+  <servlet>
+    <servlet-name>Inscription</servlet-name>
+    <servlet-class>org.digit.ECallers.servlets.Inscription</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Inscription</servlet-name>
+    <url-pattern>/Inscription</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>Restriction</servlet-name>
+    <servlet-class>org.digit.ECallers.servlets.Restriction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Restriction</servlet-name>
+    <url-pattern>/Restriction</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>Connexion</servlet-name>
+  	<servlet-class>org.digit.ECallers.servlets.Connexion</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Connexion</servlet-name>
+    <url-pattern>/Connexion</url-pattern>
+  </servlet-mapping>
+   <servlet>
+    <servlet-name>Deconnexion</servlet-name>
+    <servlet-class>org.digit.ECallers.servlets.Deconnexion</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Deconnexion</servlet-name>
+    <url-pattern>/Deconnexion</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>SearchContact</servlet-name>
+    <servlet-class>org.digit.ECallers.servlets.SearchContact</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SearchContact</servlet-name>
+    <url-pattern>/SearchContact</url-pattern>
+  </servlet-mapping>
+  <servlet>
+	<servlet-name>Download</servlet-name>
+	<servlet-class>org.digit.ECallers.servlets.Download</servlet-class>
+</servlet>
+<servlet-mapping>
+	<servlet-name>Download</servlet-name>
+	<url-pattern>/fichiers/*</url-pattern>
+</servlet-mapping>
+</web-app>

@@ -1,0 +1,12 @@
+package org.digit.ECallers.beans;
+
+public class InfosSuppl {
+	
+	private String photoUser;
+	private String dateNaiss;
+	private String email;
+	private String sexe;
+	
+	
+
+}

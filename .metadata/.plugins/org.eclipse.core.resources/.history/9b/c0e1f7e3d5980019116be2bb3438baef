@@ -1,0 +1,148 @@
+package org.digit.ECallers.forms;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.digit.ECallers.beans.User;
+import org.digit.ECallers.dao.DAOException;
+import org.digit.ECallers.dao.UserDao;
+
+import sun.util.calendar.BaseCalendar.Date;
+
+public class InfosSupplementsForm {
+	
+	private static final String CHAMP_PHOTOUSER = "photoUser";
+	private static final String CHAMP_DATENAISS = "dateNaiss";
+	private static final String CHAMP_EMAIL = "email";
+	private static final String CHAMP_SEXE = "sexe";
+
+	private String resultat;
+	private Map<String, String> erreurs = new HashMap<String, String>();
+	
+	private UserDao      utilisateurDao;
+
+	public InfosSupplementsForm( UserDao utilisateurDao ) {
+	    this.utilisateurDao = utilisateurDao;
+	}
+
+	public String getResultat() {
+	    return resultat;
+	}
+
+	public Map<String, String> getErreurs() {
+	    return erreurs;
+	}
+	
+
+	public User InfosSupplements( HttpServletRequest request ) {
+	    String photoUser = getValeurChamp( request, CHAMP_PHOTOUSER );
+	    String dateNaiss = getValeurChamp( request, CHAMP_DATENAISS );
+	    String email = getValeurChamp( request, CHAMP_EMAIL );
+	    String sexe = getValeurChamp( request, CHAMP_SEXE );
+	    
+
+	    User utilisateur = new User();
+
+	   
+	    try {
+	        traiterNom( photoUser, utilisateur );
+	        traiterPrenom( dateNaiss, utilisateur );
+	        traiterTelephone( email, utilisateur );
+	        traiterTelephone( sexe, utilisateur );
+
+	        if ( erreurs.isEmpty() ) {
+	            utilisateurDao.create( utilisateur );
+	            resultat = " Succès.";
+	        } else {
+	            resultat = " Échec.";
+	        }
+	    } catch ( DAOException e ) {
+	        resultat = "Échec : une erreur imprévue est survenue, merci de réessayer dans quelques instants.";
+	        e.printStackTrace();
+	    }
+
+
+	    return utilisateur;
+	}
+	
+	 private void traiterNom( String nom, User utilisateur ) {
+	        try {
+	            validationNom( nom );
+	        } catch ( FormValidationException e ) {
+	            setErreur( CHAMP_USERNAME, e.getMessage() );
+	        }
+	        utilisateur.setUsername( nom );
+	    }
+
+	    private void traiterPrenom( String prenom, User utilisateur ) {
+	        try {
+	            validationPrenom( prenom );
+	        } catch ( FormValidationException e ) {
+	            setErreur( CHAMP_SURNAME, e.getMessage() );
+	        }
+	        utilisateur.setSurname( prenom );
+	    }
+	    
+	    private void traiterTelephone( String telephone, User utilisateur ) {
+	        try {
+	            validationTel( telephone );
+	        } catch ( FormValidationException e ) {
+	            setErreur( CHAMP_TEL, e.getMessage() );
+	        }
+	        int tel = Integer.parseInt(telephone);
+	        utilisateur.setNum_tel( tel );
+	    }
+
+	
+	    private void validationNom( String nom ) throws FormValidationException {
+	        if ( nom != null ) {
+	            if ( nom.length() < 2 ) {
+	                throw new FormValidationException( "Le nom d'utilisateur doit contenir au moins 2 caractères." );
+	            }
+	        } else {
+	            throw new FormValidationException( "Merci d'entrer un nom d'utilisateur." );
+	        }
+	    }
+
+	    private void validationPrenom( String prenom ) throws FormValidationException {
+	        if ( prenom != null && prenom.length() < 2 ) {
+	            throw new FormValidationException( "Le prénom d'utilisateur doit contenir au moins 2 caractères." );
+	        }
+	    }
+	
+	private void validationTel( String telephone ) throws FormValidationException {
+        if ( telephone != null ) {
+            if ( !telephone.matches( "^\\d+$" ) ) {
+                throw new FormValidationException( "Le numéro de téléphone doit uniquement contenir des chiffres." );
+            } else if ( telephone.length() < 9 && telephone.length() > 9 ) {
+                throw new FormValidationException( "Le numéro de téléphone doit contenir 9 chiffres." );
+            }
+        } else {
+            throw new FormValidationException( "Merci d'entrer un numéro de téléphone." );
+        }
+    }
+
+	/*
+	 * Ajoute un message correspondant au champ spécifié à la map des erreurs.
+	 */
+	private void setErreur( String champ, String message ) {
+	    erreurs.put( champ, message );
+	}
+
+	/*
+	 * Méthode utilitaire qui retourne null si un champ est vide, et son contenu
+	 * sinon.
+	 */
+	private static String getValeurChamp( HttpServletRequest request, String nomChamp ) {
+	    String valeur = request.getParameter( nomChamp );
+	    if ( valeur == null || valeur.trim().length() == 0 ) {
+	        return null;
+	    } else {
+	        return valeur.trim();
+	    }
+	}
+
+
+}

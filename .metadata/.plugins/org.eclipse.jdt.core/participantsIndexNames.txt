@@ -1,0 +1,5 @@
+INDEX VERSION 1.130
+D:\Documents\Cours_L3\JEE\E-Callers\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\710308000.index
+\E-Call\src
+D:\Documents\Cours_L3\JEE\E-Callers\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\933941829.index
+\E-Call\src

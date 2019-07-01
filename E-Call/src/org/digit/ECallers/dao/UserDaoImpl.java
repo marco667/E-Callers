@@ -1,0 +1,214 @@
+package org.digit.ECallers.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.digit.ECallers.dao.DAOUtilitaire.*;
+
+import org.digit.ECallers.beans.Contact;
+import org.digit.ECallers.beans.InfosSuppl;
+import org.digit.ECallers.beans.User;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+
+
+
+public class UserDaoImpl implements UserDao {
+	
+	 private DAOFactory          daoFactory;
+
+	 UserDaoImpl( DAOFactory daoFactory ) {
+	        this.daoFactory = daoFactory;
+	    }
+	 
+	 /*
+	  * Simple méthode utilitaire permettant de faire la correspondance (le
+	  * mapping) entre une ligne issue de la table des utilisateurs (un
+	  * ResultSet) et un bean Utilisateur.
+	  */
+	 private static User map( ResultSet resultSet ) throws SQLException {
+	     User utilisateur = new User();
+	     utilisateur.setId_user( resultSet.getLong( "id_user" ) );
+	     utilisateur.setUsername( resultSet.getString( "username" ) );
+	     utilisateur.setSurname( resultSet.getString( "surname" ) );
+	     utilisateur.setNum_tel( resultSet.getString( "num_tel" ) );
+	     return utilisateur;
+	 }
+	 
+	 
+	 private static final String SQL_INSERT1 = "INSERT INTO user (username, surname, num_tel) VALUES (?, ?, ?)";
+
+	@Override
+	public void create(User utilisateur) throws IllegalArgumentException, DAOException {
+		// TODO Auto-generated method stub
+		 Connection connexion = null;
+		 PreparedStatement preparedStatement = null;
+		 ResultSet valeursAutoGenerees = null;
+
+		    try {
+		        /* Récupération d'une connexion depuis la Factory */
+		        connexion = (Connection) daoFactory.getConnection();
+		        preparedStatement = (PreparedStatement) initialisationRequetePreparee( connexion, SQL_INSERT1, true, utilisateur.getUsername(), utilisateur.getSurname(), utilisateur.getNum_tel() );
+		        int statut = preparedStatement.executeUpdate();
+		        /* Analyse du statut retourné par la requête d'insertion */
+		        if ( statut == 0 ) {
+		            throw new DAOException( "Échec de la création de l'utilisateur, aucune ligne ajoutée dans la table." );
+		        }
+		        /* Récupération de l'id auto-généré par la requête d'insertion */
+		        valeursAutoGenerees = preparedStatement.getGeneratedKeys();
+		        if ( valeursAutoGenerees.next() ) {
+		            /* Puis initialisation de la propriété id du bean Utilisateur avec sa valeur */
+		            utilisateur.setId_user( valeursAutoGenerees.getLong( 1 ) );
+		        } else {
+		            throw new DAOException( "Échec de la création de l'utilisateur en base, aucun ID auto-généré retourné." );
+		        }
+		    } catch ( SQLException e ) {
+		        throw new DAOException( e );
+		    } finally {
+		        fermeturesSilencieuses( valeursAutoGenerees, preparedStatement, connexion );
+		    }
+		
+		
+	}
+	
+	private static final String SQL_INSERT2 = "INSERT INTO contact (nomContact, prenomContact, telContact) VALUES (?, ?, ?)";
+	
+	@Override
+	public void createContact(String nomContact, String prenomContact, String numcontact) throws DAOException {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+				 Connection connexion = null;
+				 PreparedStatement preparedStatement = null;
+				 ResultSet valeursAutoGenerees = null;
+
+				    try {
+				        /* Récupération d'une connexion depuis la Factory */
+				        connexion = (Connection) daoFactory.getConnection();
+				        preparedStatement = (PreparedStatement) initialisationRequetePreparee( connexion, SQL_INSERT2, true, nomContact, prenomContact, numcontact );
+				        int statut = preparedStatement.executeUpdate();
+				        /* Analyse du statut retourné par la requête d'insertion */
+				        if ( statut == 0 ) {
+				            throw new DAOException( "Échec de creation du contact." );
+				        }
+				        
+				    } catch ( SQLException e ) {
+				        throw new DAOException( e );
+				    } finally {
+				        fermeturesSilencieuses( valeursAutoGenerees, preparedStatement, connexion );
+				    }
+		
+	}
+	
+	private static final String SQL_INSERT3 = "INSERT INTO infossuppl (photoUser, dateNaiss, email, sexe, id_user) VALUES (?, ?, ?, ?, ?)";
+	
+	@Override
+	public void addInfosByuser(InfosSuppl infosUser) throws DAOException {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+				 Connection connexion = null;
+				 PreparedStatement preparedStatement = null;
+				 ResultSet valeursAutoGenerees = null;
+				 User utilisateur = infosUser.getUtilisateur();
+				 long id_user = utilisateur.getId_user();
+
+				    try {
+				        /* Récupération d'une connexion depuis la Factory */
+				        connexion = (Connection) daoFactory.getConnection();
+				        preparedStatement = (PreparedStatement) initialisationRequetePreparee( connexion, SQL_INSERT3, true, infosUser.getPhotoUser(), infosUser.getDateNaiss(), infosUser.getEmail(), infosUser.getSexe(), id_user);
+				        int statut = preparedStatement.executeUpdate();
+				        /* Analyse du statut retourné par la requête d'insertion */
+				        if ( statut == 0 ) {
+				            throw new DAOException( "Echec d'ajout d'informations." );
+				        }
+				        
+				    } catch ( SQLException e ) {
+				        throw new DAOException( e );
+				    } finally {
+				        fermeturesSilencieuses( valeursAutoGenerees, preparedStatement, connexion );
+				    }
+		
+	}
+	
+	 private static final String SQL_SELECT_PAR_NUMERO_USER = "SELECT id_user, username, surname, num_tel FROM user WHERE username = ? AND num_tel = ?";
+	
+	@Override
+	public User search( String username, String num_tel) throws DAOException {
+		// TODO Auto-generated method stub
+		/* Impl�mentation de la m�thode d�finie dans l'interface UtilisateurDao */
+	
+		    Connection connexion = null;
+		    PreparedStatement preparedStatement = null;
+		    ResultSet resultSet = null;
+		    User utilisateur = null;
+		    
+
+		    try {
+		        /* R�cup�ration d'une connexion depuis la Factory */
+		        connexion = (Connection) daoFactory.getConnection();
+		        preparedStatement = (PreparedStatement) initialisationRequetePreparee( connexion, SQL_SELECT_PAR_NUMERO_USER, false, username, num_tel );
+		        resultSet = preparedStatement.executeQuery();
+		        /* Parcours de la ligne de donn�es de l'�ventuel ResulSet retourn� */
+		        if ( resultSet.next() ) {
+		            utilisateur = map( resultSet );
+		        }else {
+		        	throw new DAOException( "Utilisateur inconnu." );
+		        }
+		    } catch ( SQLException e ) {
+		        throw new DAOException( e );
+		    } finally {
+		        fermeturesSilencieuses( resultSet, preparedStatement, connexion );
+		    }
+
+		    return utilisateur;
+		
+	}
+	 
+   
+
+    private static final String SQL_SELECT_PAR_NUMERO = "SELECT id_contact, nomContact, prenomContact, telContact FROM contact WHERE telContact = ?";
+	
+	
+
+    private static Contact map1( ResultSet resultSet ) throws SQLException {
+   	     Contact contact = new Contact();
+   	     contact.setId_contact( resultSet.getLong( "id_contact" ) );
+   	     contact.setNomContact( resultSet.getString( "nomContact" ) );
+   	     contact.setPrenomContact( resultSet.getString( "prenomContact" ) );
+   	     contact.setNumcontact( resultSet.getString( "telContact" ) );
+   	     return contact;
+   	 }
+
+
+   @Override
+   	public Contact searchContact(String telContact) throws DAOException {
+   		// TODO Auto-generated method stub
+   		 Connection connexion = null;
+   		    PreparedStatement preparedStatement = null;
+   		    ResultSet resultSet = null;
+   		    Contact contact  = null;
+
+   		    try {
+   		        /* Récupération d'une connexion depuis la Factory */
+   		        connexion = (Connection) daoFactory.getConnection();
+   		        preparedStatement = (PreparedStatement) initialisationRequetePreparee( connexion, SQL_SELECT_PAR_NUMERO, false, telContact );
+   		        resultSet = preparedStatement.executeQuery();
+   		        /* Parcours de la ligne de données de l'éventuel ResulSet retourné */
+   		        if ( resultSet.next() ) {
+   		            contact = map1( resultSet );
+   		        }else {
+   		        	throw new DAOException( "Contact non identifi�." );
+   		        }
+   		    } catch ( SQLException e ) {
+   		        throw new DAOException( e );
+   		    } finally {
+   		        fermeturesSilencieuses( resultSet, preparedStatement, connexion );
+   		    }
+
+   		    return contact;
+   		
+   	}
+
+
+
+}

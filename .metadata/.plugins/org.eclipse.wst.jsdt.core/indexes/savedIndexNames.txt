@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+D:\Documents\Cours_L3\JEE\E-Callers\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+642472778.index
+2325120826.index
+3530002727.index
+1378186187.index
+380778100.index
+3698945751.index
